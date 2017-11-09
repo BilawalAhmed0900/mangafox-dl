@@ -10,6 +10,7 @@ import zlib
 import sys
 import os.path
 import os
+import threading
 import re
 
 if os.name == "nt":
@@ -59,25 +60,15 @@ def main():
         
 def download_series(url, from_ch, to_ch):
     url_http = url.replace("https://", "http://")
-    req = Request(url_http)
+    req = Request(url_http, headers={'User-Agent': 'Mozilla/5.0'})
     if not req:
         print("[mangafox-dl] Page not found...")
         sys.exit(-1)
     
     print("[mangafox-dl] Requesting Webpage")
-    page_open = urlopen(req)
     print("[mangafox-dl] Reading Webpage")
-    
-    try:
-        is_encoded = page_open.info()["Content-Encoding"]
-    except:
-        is_encoded = "None"
-        
-    if is_encoded == "gzip":
-        page = zlib.decompress(page_open.read(), 16 + zlib.MAX_WBITS)
-    else:
-        page = page_open.read()
-        
+
+    page = get_url_content(url.replace("https", "http"))  
     truncated_for_name = page[page.find(b'og:title') + 19 : ]
     name = truncated_for_name[ : truncated_for_name.find(b' Manga"')]
     
@@ -94,68 +85,61 @@ def download_series(url, from_ch, to_ch):
     if not os.path.exists(name.decode()):
         os.makedirs(name.decode())
     for chap in range(from_ch - 1, to_ch):
-        print("[mangafox-dl] Downloading chapter: {:s}".format(str(chap + 1).zfill(3)), end="\r")
+        #print("[mangafox-dl] Downloading chapter: {:s}".format(str(chap + 1).zfill(3)), end="\r")
         Volume = chapters[chap][chapters[chap].find(b"/v") + 2 : ]
         Volume = Volume[ : Volume.find(b"/")]
         dir_name = name.decode() + path_delim + "Volume " + Volume.decode().zfill(2) + path_delim + "Chapter " + str(chap + 1).zfill(2)
         download_chapter("http:" + chapters[chap].decode().replace("1.html", ""), dir_name, chap + 1)
-    
+        
 def download_chapter(url, dir_name = "Chapter", number = 0):
-    page_number = 1
-    previous_img_url = ""
-    
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
     
-    while True:
-        page_url = url + "{}.html".format(page_number)
-        req = Request(page_url)
-        if not req:
-            return
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    first_page = urlopen(req).read()
+    
+    find_str_I = b'<select onchange="change_page(this)" class="m">'
+    find_str_II = b'class="btn next_page">'
+    first_page = first_page[first_page.find(find_str_I) + len(find_str_I.decode()) : first_page.find(find_str_II)]
+    urls = re.findall(b'<option value="[1-9]+" >', first_page)
+    for i in range(0, len(urls)):
+        urls[i] = urls[i][urls[i].find(b'"') + 1 : ]
+        urls[i] = urls[i][ : urls[i].find(b'"')]
         
-        page_open = urlopen(req)
+        page = get_url_content(url + urls[i].decode() + ".html")
+        page = page[page.find(b'<div class="read_img">') +  22: ]
+        page = page[page.find(b'<img src="') + 10 : ]
+        page = page[ : page.find(b'"')]
+        page.replace(b"https", b"http")
         
-        try:
-            is_encoded = page_open.info()["Content-Encoding"]
-        except:
-            is_encoded = "None"
-        
-        if is_encoded == "gzip":
-            page = zlib.decompress(page_open.read(), 16 + zlib.MAX_WBITS)
-        else:
-            page = page_open.read()
-
-        truncated_for_pic = page[page.find(b'<div class="read_img">') : ]
-        truncated_for_pic = truncated_for_pic[truncated_for_pic.find(b'<img src="') + 10 : ]
-        pic_url = truncated_for_pic[ : truncated_for_pic.find(b'"')]
-        real_img_url = pic_url.decode()[ : pic_url.decode().find("?token")]
-        if previous_img_url == real_img_url or pic_url == b"":
-            return
-            
-        pic_url.replace(b"https", b"http")
-        pic_page_req = Request(pic_url.decode())
-        pic_page = urlopen(pic_page_req)
-        Size = int(pic_page.info()["Content-Length"])
-        NAME = dir_name + path_delim + "{:3d}".format(page_number) + ".jpg"
-        
-        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(page_number).zfill(3)), end="")
-        sys.stdout.flush()
-        if (os.path.isfile(NAME) and os.path.getsize(NAME) == Size):
-            previous_img_url = pic_url.decode()
-            page_number += 1 
+        NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
+        if os.path.isfile(NAME):
             continue
-        pic = open(NAME, "wb")
-        while True:
-            block_size = 8192
-            block = pic_page.read(block_size)
-            if not block:
-                break
-            else:
-                pic.write(block)
-                
-        pic.close()
-        previous_img_url = real_img_url
-        page_number += 1 
+           
+        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
+        sys.stdout.flush()
+        
+        img = get_url_content(page.decode())  
+        file = open(NAME, "wb")
+        file.write(img)
+        file.close()
+        
+        
+def get_url_content(url):
+    req = Request(url)
+    page_open = urlopen(req)
+    try:
+        is_encoded = page_open.info()["Content-Encoding"]
+    except:
+        is_encoded = "None"
+        
+    if is_encoded == "gzip":
+        return zlib.decompress(page_open.read(), 16 + zlib.MAX_WBITS)
+    elif is_encoded == "None" or is_encoded is None:
+        return page_open.read()
+    else:
+        print(is_encoded)
+        sys.exit(-1)
     
     
 if __name__ == "__main__":
