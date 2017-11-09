@@ -10,7 +10,6 @@ import zlib
 import sys
 import os.path
 import os
-import threading
 import re
 
 if os.name == "nt":
