@@ -5,3 +5,16 @@ Manga downloader for mangafox.me
     python mangafox.py link-to-mangafox [[from]-[to]]
     
 Can be used with python 2 and python 3
+
+# **Example**
+    python mangafox.py link-to-mangafox
+--> *Download all chapters*
+
+    python mangafox.py link-to-mangafox -100
+--> *Download all till hundred(including **hundred**)*
+
+    python mangafox.py link-to-mangafox 100-
+--> *Download all from hundred(including **hundred**)*
+
+    python mangafox.py link-to-mangafox 100-110
+--> *Download all from hundred to hundred and ten(including **hundred** and **hundred and ten**)*
