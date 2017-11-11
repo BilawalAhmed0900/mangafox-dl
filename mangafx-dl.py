@@ -130,8 +130,8 @@ def get_url_content(url):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         page_open = urlopen(req)
     except HTTPError:
-        print("\n\n[mangafox-dl] Not a correct series name... exiting")
-        sys.exit(-1)
+        print("\n\n[mangafox-dl] Webpage not found, Error code: {}".format(HTTPError.code))
+        return b""
     
     try:
         is_encoded = page_open.info()["Content-Encoding"]
