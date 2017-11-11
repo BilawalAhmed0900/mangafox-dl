@@ -86,8 +86,12 @@ def download_series(url, from_ch, to_ch):
     
     if not os.path.exists(name.decode()):
         os.makedirs(name.decode())
-    for chap in range(from_ch - 1, to_ch):
-        #print("[mangafox-dl] Downloading chapter: {:s}".format(str(chap + 1).zfill(3)), end="\r")
+    
+    range_list = list(range(from_ch - 1, to_ch))   
+    for chap in range_list:
+        print("\r[mangafox-dl] Downloading chapter: {:s}".format(str(chap + 1).zfill(3)), end="")
+        sys.stdout.flush()
+        
         Volume = chapters[chap][chapters[chap].find(b"/v") + 2 : ]
         Volume = Volume[ : Volume.find(b"/")]
         dir_name = name.decode() + path_delim + "Volume " + Volume.decode().zfill(2) + path_delim + "Chapter " + str(chap + 1).zfill(2)
@@ -101,7 +105,7 @@ def download_chapter(url, dir_name = "Chapter", number = 0):
     find_str_I = b'<select onchange="change_page(this)" class="m">'
     find_str_II = b'class="btn next_page">'
     first_page = first_page[first_page.find(find_str_I) + len(find_str_I.decode()) : first_page.find(find_str_II)]
-    urls = re.findall(b'<option value="[1-9]+" >', first_page)
+    urls = re.findall(b'<option value="[0-9]+" >', first_page)
     for i in range(0, len(urls)):
         NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
         print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
@@ -129,8 +133,8 @@ def get_url_content(url):
     try:
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         page_open = urlopen(req)
-    except HTTPError:
-        print("\n\n[mangafox-dl] Webpage({}) not found, Error code: {}".format(url, HTTPError.code))
+    except HTTPError as error:
+        print("\n\n[mangafox-dl] Webpage({}) not found, Error code: {}".format(url, error.code))
         return b""
     
     try:
