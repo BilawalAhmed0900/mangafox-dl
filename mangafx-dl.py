@@ -113,11 +113,11 @@ def download_chapter(url, dir_name = "Chapter", number = 0):
         page.replace(b"https", b"http")
         
         NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
-        if os.path.isfile(NAME):
-            continue
-           
         print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
         sys.stdout.flush()
+        
+        if os.path.isfile(NAME):
+            continue
         
         img = get_url_content(page.decode())  
         file = open(NAME, "wb")
@@ -130,7 +130,7 @@ def get_url_content(url):
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         page_open = urlopen(req)
     except HTTPError:
-        print("\n\n[mangafox-dl] Webpage not found, Error code: {}".format(HTTPError.code))
+        print("\n\n[mangafox-dl] Webpage({}) not found, Error code: {}".format(url, HTTPError.code))
         return b""
     
     try:
