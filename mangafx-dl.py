@@ -107,8 +107,8 @@ def download_chapter(url, dir_name = "Chapter", number = 0):
     first_page = first_page[first_page.find(find_str_I) + len(find_str_I.decode()) : first_page.find(find_str_II)]
     urls = re.findall(b'<option value="[0-9]+" >', first_page)
     for i in range(0, len(urls)):
-        NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
-        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
+        NAME = dir_name + path_delim + "{}".format(i + 1).zfill(3) + ".jpg"
+        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}{:s}".format(str(number).zfill(3), str(i + 1).zfill(3), int_to_th(i + 1)), end="")
         sys.stdout.flush()
         
         if os.path.isfile(NAME):
@@ -140,16 +140,26 @@ def get_url_content(url):
     try:
         is_encoded = page_open.info()["Content-Encoding"]
     except:
-        is_encoded = "None"
+        is_encoded = None
         
     if is_encoded == "gzip":
         return zlib.decompress(page_open.read(), 16 + zlib.MAX_WBITS)
-    elif is_encoded == "None" or is_encoded is None:
+    elif is_encoded is None:
         return page_open.read()
     else:
         print(is_encoded)
         sys.exit(-1)
     
+def int_to_th(num):
+    n = num % 10
+    if n == 1:
+        return "st"
+    elif n == 2:
+        return "nd"
+    elif n == 3:
+        return "rd"
+    else:
+        return "th"
     
 if __name__ == "__main__":
     main()
