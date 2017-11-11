@@ -1,6 +1,11 @@
 # mangafox-dl
 Manga downloader for mangafox.me
 
+# **Install**
+    pip install mangafox-dl
+    
+Make sure you have the latest version **v1.1.3**
+
 # **Usage**
     python mangafox.py link-to-mangafox [[from]-[to]]
     
