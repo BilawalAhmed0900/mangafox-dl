@@ -103,6 +103,13 @@ def download_chapter(url, dir_name = "Chapter", number = 0):
     first_page = first_page[first_page.find(find_str_I) + len(find_str_I.decode()) : first_page.find(find_str_II)]
     urls = re.findall(b'<option value="[1-9]+" >', first_page)
     for i in range(0, len(urls)):
+        NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
+        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
+        sys.stdout.flush()
+        
+        if os.path.isfile(NAME):
+            continue
+        
         urls[i] = urls[i][urls[i].find(b'"') + 1 : ]
         urls[i] = urls[i][ : urls[i].find(b'"')]
         
@@ -111,13 +118,6 @@ def download_chapter(url, dir_name = "Chapter", number = 0):
         page = page[page.find(b'<img src="') + 10 : ]
         page = page[ : page.find(b'"')]
         page.replace(b"https", b"http")
-        
-        NAME = dir_name + path_delim + "{}".format(i).zfill(3) + ".jpg"
-        print("\r[mangafox-dl] Downloading chapter: {:s} | Panel: {:s}".format(str(number).zfill(3), str(i + 1).zfill(3)), end="")
-        sys.stdout.flush()
-        
-        if os.path.isfile(NAME):
-            continue
         
         img = get_url_content(page.decode())  
         file = open(NAME, "wb")
