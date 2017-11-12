@@ -9,7 +9,7 @@ Make sure you have the latest version **v1.1.3**
 # **Usage**
     $ python mangafox.py link-to-mangafox [[from]-[to]]
     
-Can be used with python 2 and python 3
+Can be used with python 2.7.x and python 3.x
 
 # **Example**
     $ python mangafox.py link-to-mangafox
