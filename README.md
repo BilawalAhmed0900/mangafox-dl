@@ -23,3 +23,7 @@ Can be used with python 2.7.x and python 3.x
 
     $ python mangafox.py link-to-mangafox 100-110
 **-->** *Download all from hundred to hundred and ten(including **hundred** and **hundred and ten**)*
+
+# Viewing
+I recommend [Cdisplayex](http://www.cdisplayex.com/) for viewing. 
+Just select the folder of the chapter and start reading mangas
