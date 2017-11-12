@@ -1,3 +1,10 @@
+- Contents
+  - [Intro](https://github.com/Dragneel1234/mangafox-dl#mangafox-dl)
+  - [Install](https://github.com/Dragneel1234/mangafox-dl#install)
+  - [Usage](https://github.com/Dragneel1234/mangafox-dl#usage)
+  - [Example](https://github.com/Dragneel1234/mangafox-dl#example)
+  - [Viewing](https://github.com/Dragneel1234/mangafox-dl#viewing)
+
 # mangafox-dl
 Manga downloader for mangafox.me
 
