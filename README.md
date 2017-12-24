@@ -6,7 +6,7 @@
   - [Viewing](https://github.com/Dragneel1234/mangafox-dl#viewing)
 
 # mangafox-dl
-Manga downloader for mangafox.me
+Manga downloader for mangafox.la
 
 # **Install**
     $ pip install mangafox-dl
