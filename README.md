@@ -11,7 +11,7 @@ Manga downloader for mangafox.la
 # **Install**
     $ pip install mangafox-dl
     
-Make sure you have the latest version **v1.1.3**
+Make sure you have the latest version **v1.1.4**
 
 # **Usage**
     $ python mangafox.py link-to-mangafox [[from]-[to]]
