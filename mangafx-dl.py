@@ -18,6 +18,8 @@ elif os.name == "posix":
     path_delim = "/"
     
 download_all_ep = 1234567890
+
+domain = "fanfox.net"
     
 def main():
     from_ch = 1
@@ -50,7 +52,7 @@ def main():
                     sys.exit(-1)
                 
                 
-    if "mangafox.la/manga/" in sys.argv[1]:
+    if "{:s}/manga/".format(domain) in sys.argv[1]:
         print("[mangafox-dl] Detected a possibly series/chapter link")
         if ".html" in sys.argv[1]:
             try:
@@ -77,7 +79,7 @@ def download_series(url, from_ch, to_ch):
     print("\n[mangafox-dl] Manga: {}".format(name.decode()))
     truncated_for_chapters = page[page.find((name.decode().upper() + " </a> Chapters").encode()) : ]
     print("[mangafox-dl] Getting Chapters")
-    chapters = re.findall(b"//mangafox.la/manga/[a-z_]*/v[A-Z0-9]*/c[0-9]*/1.html", truncated_for_chapters)[::-1]
+    chapters = re.findall(bytes("//{:s}/manga/[a-z_]*/v[A-Z0-9]*/c[0-9]*/1.html".format(domain), "utf-8"), truncated_for_chapters)[::-1]
     if to_ch > len(chapters):
         to_ch = len(chapters)
         
